@@ -23,6 +23,7 @@
 @property (nonatomic, readwrite) NSArray<NSNumber *> *segmentWidthsArray;
 @property (nonatomic, strong) HMScrollView *scrollView;
 @property (nonatomic, assign) BOOL disabledLayerDirty;
+@property (nonatomic, assign) BOOL updatingDisabledMask;
 
 @end
 
@@ -712,8 +713,8 @@
 }
 
 - (void)updateDisabledMask {
-    if ( self.disabledLayerDirty ||
-         (self.disabledLayer != nil && !CGSizeEqualToSize(self.disabledLayer.frame.size, self.layer.bounds.size))) {
+    if (!self.updatingDisabledMask && (self.disabledLayerDirty || (self.disabledLayer != nil && !CGSizeEqualToSize(self.disabledLayer.frame.size, self.layer.bounds.size)))) {
+        self.updatingDisabledMask = YES;
         if (self.disabledLayer != nil) {
             [self.disabledLayer removeFromSuperlayer];
         }
@@ -738,6 +739,7 @@
         [self.layer addSublayer:self.disabledLayer];
         
         self.disabledLayerDirty = NO;
+        self.updatingDisabledMask = NO;
     }
 }
 
